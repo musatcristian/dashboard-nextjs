@@ -5,7 +5,7 @@ export const displayFont = Berkshire_Swash({
   weight: ["400"],
 });
 
-export const lusitana = Cabin_Condensed({
+export const textFont = Cabin_Condensed({
   subsets: ["latin"],
   weight: ["400", "700"],
 });
