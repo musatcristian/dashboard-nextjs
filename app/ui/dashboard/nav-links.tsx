@@ -48,7 +48,7 @@ export default function NavLinks() {
     });
 
     setLinks(l);
-  }, [pathname, list]);
+  }, [pathname]);
 
   return <>{links}</>;
 }
