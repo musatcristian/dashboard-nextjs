@@ -108,6 +108,7 @@ const generateInvoicesData: (list: InvoicesTable[]) => {
 
 const InvoicesTable: FC<IIvoicesTable> = async ({ query, currentPage }) => {
   const list = await fetchFilteredInvoices(query, currentPage);
+
   const { invoices, tableData } = generateInvoicesData(list);
 
   return (
