@@ -21,8 +21,6 @@ const Page: FC<IInvoicesPageProps> = async ({ searchParams }) => {
 
   const totalPages = await fetchInvoicesPages(query);
 
-  console.log("SERVER", query, currentPage);
-
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">

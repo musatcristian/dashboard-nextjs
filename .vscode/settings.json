@@ -10,7 +10,7 @@
   "editor.wrappingStrategy": "advanced",
   "editor.wordWrapColumn": 120,
   "editor.wordWrap": "bounded",
-  "editor.wrappingIndent": "same",
+  "editor.wrappingIndent": "deepIndent",
   "workbench.editor.wrapTabs": true,
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
