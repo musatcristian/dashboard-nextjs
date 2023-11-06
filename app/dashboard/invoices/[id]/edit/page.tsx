@@ -1,6 +1,7 @@
 import { fetchCustomers, fetchInvoiceById } from "@/app/lib/data";
 import Breadcrumbs from "@/app/ui/invoices/breadcrumbs";
 import Form from "@/app/ui/invoices/edit-form";
+import { notFound } from "next/navigation";
 import { FC } from "react";
 
 const EditInvoice: FC<{ params: any }> = async ({ params }) => {
@@ -11,7 +12,9 @@ const EditInvoice: FC<{ params: any }> = async ({ params }) => {
     fetchCustomers(),
   ]);
 
-  //   console.info(invoice, customers);
+  if (!invoice) {
+    notFound();
+  }
 
   return (
     <main>

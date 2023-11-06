@@ -68,11 +68,17 @@ export const updateInvoice = async (id: string, formData: FormData) => {
 };
 
 export const deleteInvoice = async (id: string) => {
+  // throw new SyntaxError("EORARRWRARA");
+
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
-  } catch (error) {
-    console.warn(error);
-  } finally {
     revalidatePath("/dashboard/invoices");
+    return { message: "invoice deleted" };
+  } catch (error) {
+    console.info("SERVER ERROR", (error as Error).message);
+
+    throw new Error((error as Error).message);
+    // return { message: `Error deleting invoice with id: ${id}` };
+  } finally {
   }
 };
