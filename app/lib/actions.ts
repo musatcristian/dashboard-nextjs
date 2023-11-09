@@ -7,29 +7,53 @@ import { z } from "zod";
 
 const InvoiceSchema = z.object({
   id: z.string(),
-  customerId: z.string(),
-  amount: z.coerce.number(),
-  status: z.enum(["pending", "paid"]),
+  customerId: z.string({
+    invalid_type_error: "Please select a dude",
+  }),
+  amount: z.coerce
+    .number()
+    .gt(0, { message: "Please enter an amount bigger than 0" }),
+  status: z.enum(["pending", "paid"], {
+    invalid_type_error: "Please select an invoice status",
+  }),
   date: z.string(),
 });
 
+export type State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+};
+
 const CreateInvoice = InvoiceSchema.omit({ id: true, date: true });
 
-export const createInvoice = async (formData: FormData) => {
-  const rawFormData = CreateInvoice.parse({
+export const createInvoice = async (prevState: State, formData: FormData) => {
+  console.info("CERTEASDASDASD", prevState);
+
+  const validFields = CreateInvoice.safeParse({
     customerId: formData.get("customerId"),
     amount: formData.get("amount"),
     status: formData.get("status"),
   });
 
-  const amountInCents = Number(rawFormData.amount * 100);
-  const date = new Date().toISOString().split("T")[0];
-  // Test it out:
+  if (!validFields.success) {
+    return {
+      errors: validFields.error.flatten().fieldErrors,
+      message: "MIssing fields. Failed to create invoice",
+    };
+  }
 
+  const { amount, customerId, status } = validFields.data;
+
+  const amountInCents = Number(amount * 100);
+  const date = new Date().toISOString().split("T")[0];
   try {
     await sql`
         INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${rawFormData.customerId}, ${amountInCents}, ${rawFormData.status}, ${date})
+        VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
     `;
   } catch (error) {
     console.warn(error);
@@ -43,15 +67,22 @@ export const createInvoice = async (formData: FormData) => {
 const UpdateInvoice = InvoiceSchema.omit({ date: true, id: true });
 
 export const updateInvoice = async (id: string, formData: FormData) => {
-  console.log("\t\t\t\t\tupdateInvoice\n\n\n", formData);
+  const validateForm = UpdateInvoice.safeParse({
+    customerId: formData.get("customerId"),
+    amount: formData.get("amount"),
+    status: formData.get("status"),
+  });
+
+  if (!validateForm.success) {
+    return {
+      errors: validateForm.error.flatten().fieldErrors,
+      message: "MIssing fields. Failed to create invoice",
+    };
+  }
+
+  const { amount, customerId, status } = validateForm.data;
 
   try {
-    const { customerId, amount, status } = UpdateInvoice.parse({
-      customerId: formData.get("customerId"),
-      amount: formData.get("amount"),
-      status: formData.get("status"),
-    });
-
     const amountInCents = Number(amount * 100);
 
     await sql`
@@ -68,8 +99,6 @@ export const updateInvoice = async (id: string, formData: FormData) => {
 };
 
 export const deleteInvoice = async (id: string) => {
-  // throw new SyntaxError("EORARRWRARA");
-
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
     revalidatePath("/dashboard/invoices");
