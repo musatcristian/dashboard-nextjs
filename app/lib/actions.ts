@@ -1,5 +1,6 @@
 "use server";
 
+import { signIn, signOut } from "@/auth";
 import { sql } from "@vercel/postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -31,8 +32,6 @@ export type State = {
 const CreateInvoice = InvoiceSchema.omit({ id: true, date: true });
 
 export const createInvoice = async (prevState: State, formData: FormData) => {
-  console.info("CERTEASDASDASD", prevState);
-
   const validFields = CreateInvoice.safeParse({
     customerId: formData.get("customerId"),
     amount: formData.get("amount"),
@@ -110,4 +109,24 @@ export const deleteInvoice = async (id: string) => {
     // return { message: `Error deleting invoice with id: ${id}` };
   } finally {
   }
+};
+
+export const authenticate = async (
+  prevState: string | undefined,
+  formData: FormData
+) => {
+  try {
+    await signIn("credentials", Object.fromEntries(formData));
+  } catch (error) {
+    if ((error as Error).message.includes("CredentialsSignin")) {
+      return "CredentialSignin";
+    }
+    throw error;
+  }
+};
+
+export const logoff = async () => {
+  "use server";
+
+  await signOut();
 };
