@@ -1,8 +1,14 @@
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { FC } from "react";
+
 import { fetchCustomers, fetchInvoiceById } from "@/app/lib/data";
 import Breadcrumbs from "@/app/ui/invoices/breadcrumbs";
 import Form from "@/app/ui/invoices/edit-form";
-import { notFound } from "next/navigation";
-import { FC } from "react";
+
+export const metadata: Metadata = {
+  title: "Edit Invoices",
+};
 
 const EditInvoice: FC<{ params: any }> = async ({ params }) => {
   const { id } = params;
